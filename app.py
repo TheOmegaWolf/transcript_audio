@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for
 import sqlite3
 import speech_recognition as sr
 import os
+from pydub import AudioSegment
 
 app = Flask(__name__)
 
@@ -54,22 +55,30 @@ def transcribe():
     if file:
         file_path = os.path.join('uploads', file.filename)
         file.save(file_path)
-        print(f"Saved file path: {file_path}")
         
         try:
-            with sr.AudioFile(file_path) as source:
+            sound = AudioSegment.from_file(file_path, format="webm")
+            wav_path = file_path.rsplit('.', 1)[0] + '.wav'
+            sound.export(wav_path, format="wav")
+            
+            with sr.AudioFile(wav_path) as source:
                 audio = recognizer.record(source)
-            os.remove(file_path)  # Clean up the audio file after processing
+            os.remove(file_path)  # Clean up the webm file after processing
+            os.remove(wav_path)  # Clean up the wav file after processing
             text = recognizer.recognize_google(audio)
-            return jsonify({'transcription': text})
-        except sr.UnknownValueError:
-            return jsonify({'error': 'Could not understand audio'})
-        except sr.RequestError:
-            return jsonify({'error': 'Could not request results'})
-        except ValueError as e:
-            print(f"ValueError: {e}")
-            return jsonify({'error': str(e)})
 
+            # Save the transcription as a note
+            conn = sqlite3.connect('notes.db')
+            c = conn.cursor()
+            c.execute("INSERT INTO notes (content, highlighted) VALUES (?, ?)", (text, False))
+            note_id = c.lastrowid
+            conn.commit()
+            conn.close()
+
+            return jsonify({'transcription': text, 'note_id': note_id})
+        except Exception as e:
+            return jsonify({'error': str(e)})
+        
 if __name__ == "__main__":
     if not os.path.exists('uploads'):
         os.makedirs('uploads')

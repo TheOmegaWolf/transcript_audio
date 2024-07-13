@@ -8,17 +8,17 @@
 <body>
     <h1>Notes</h1>
     <form action="/add" method="post">
-        <textarea name="content" rows="4" cols="50"></textarea>
+        <textarea name="content" rows="4" cols="50" placeholder="Write your note here..."></textarea>
         <br>
         <button type="submit">Add Note</button>
     </form>
     <br>
-    <div>
-        <button id="startRecording">Start Recording</button>
-        <button id="stopRecording" disabled>Stop Recording</button>
+    <div id="recording-controls">
+        <button id="startRecording">🎤</button>
+        <button id="stopRecording" disabled>⏹️</button>
         <p id="status">Click "Start Recording" to begin...</p>
     </div>
-    <ul>
+    <ul id="notes">
         {% for note in notes %}
             <li style="background-color: {{ 'yellow' if note[2] else 'white' }}">
                 {{ note[1] }}
@@ -26,8 +26,7 @@
             </li>
         {% endfor %}
     </ul>
-    <script src="{{ url_for('static', filename='ffmpeg-core.js') }}"></script>
-    <script src="{{ url_for('static', filename='ffmpeg.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.9.7"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
