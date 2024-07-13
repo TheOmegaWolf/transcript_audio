@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+}
+h1 {
+    color: #333;
+}
+textarea {
+    width: 100%;
+}
+button {
+    margin-top: 10px;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+li {
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+}
+a {
+    margin-left: 10px;
+    text-decoration: none;
+    color: blue;
+}
+#status {
+    margin-top: 10px;
+    font-size: 16px;
+}
